@@ -80,6 +80,30 @@ class Accounts{
 		System.out.println(ioEx);
 	}
 }
+public void loadPersons ( ){
+	String tokens[] = null;
+	String name, accNum;
+	double amount;
+	try {
+		FileReader fr = new FileReader("persons.txt");
+		BufferedReader br = new BufferedReader(fr);
+		String line = br.readLine();
+		while ( line != null ) {
+			tokens = line.split(",");
+			name = tokens[0];
+			accNum= tokens[1];
+			amount =  Double.parseDouble(tokens[2]);
+			Bank p = new Bank(name, accNum, amount);
+			persons.add(p);
+			line = br.readLine();
+	}
+		br.close();
+		fr.close();
+	}
+	catch(IOException ioEx)
+		{ System.out.println(ioEx);
+	 }
+}
 
 	public void addPerson(){
 	Bank p = new Bank();
@@ -112,8 +136,14 @@ class Accounts{
 	 Scanner in = new Scanner(System.in);
 	 String accNum;
 	 double amount ;
-	double cur;
+	double cur,sen;
+	String fromAccNum;
 	 boolean exist= false;
+	System.out.print("Enter the your accNum :\n");
+	fromAccNum= in.nextLine();
+	exist=  searchPerson(fromAccNum);
+	if(exist == false)
+		throw new noAccountAvailbaleException();
 	System.out.print("Enter the accNum of a recepient :\n");
 	accNum= in.nextLine();
 	exist=  searchPerson(accNum);
@@ -122,10 +152,14 @@ class Accounts{
 	System.out.print("Enter the amount you want to send\n");
 	amount = in.nextDouble();
 	Bank transferedAcc = searchPersonObj(accNum);
-	 
+	Bank senderAcc = searchPersonObj(fromAccNum);
 	cur=transferedAcc.getAmount();
 	cur+=amount;
 	transferedAcc.setAmount(cur);
+	
+	sen=senderAcc.getAmount();
+	sen-=amount;
+	senderAcc.setAmount(sen);
 	savePersons ( );
 	}catch(noAccountAvailbaleException e){
 		e.errorMessage();
@@ -138,6 +172,7 @@ class Accounts{
 class Lab06{
     public static void main(String [] args){
     Accounts ac = new Accounts();
+    ac.loadPersons();
     int n;
     boolean flag = false;
     Scanner in = new Scanner(System.in);
